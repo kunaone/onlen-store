@@ -34,7 +34,6 @@
         $('#delete_msg').text('Apakah anda ingin menghapus produk ' + prodcode + '?');
     });
 
-
     /*==================
       GET DATA by ID
     ==================*/
@@ -175,6 +174,53 @@
         history.pushState(null, '', '?page=products');
     })
 
+    /*=========================
+        PRODUCT RESULT MODAL
+    =========================*/
+    function showProductResult(type, title, message) {
+
+        $('#resultProdTitle').html(title);
+        $('#resultProdMessage').text(message);
+
+        $('#resultProdHeader').removeClass('status-paid status-pending status-declined');
+
+        if (type == 'success') {
+
+            $('#resultProdHeader').addClass('status-paid');
+
+        } else if (type == 'warning') {
+
+            $('#resultProdHeader').addClass('status-pending');
+
+        } else {
+
+            $('#resultProdHeader').addClass('status-declined');
+        }
+
+        $('#resultProd').modal('show');
+    }
+
+    /*=========================
+     SHOW RESULT AFTER RELOAD
+    =========================*/
+
+    $(document).ready(function() {
+
+        var message = sessionStorage.getItem('productUpdateMessage');
+
+        if (message) {
+
+            sessionStorage.removeItem('productUpdateMessage');
+
+            showProductResult(
+                'success',
+                'Update Berhasil',
+                message
+            );
+        }
+
+    });
+
     /*==================
     SUBMIT FORM PRODUCT
     ==================*/
@@ -201,32 +247,46 @@
             success: function(response) {
 
                 if (response.status) {
-                    
-                    console.log('UPDATE RESPONSE:', response);
 
-                    $('#editProduct').modal('hide');
-                    
                     history.pushState(
                             null,
                             '',
                             '?page=products'
                     );
 
+                    sessionStorage.setItem(
+                        'productUpdateMessage',
+                        response.message
+                    );
+
+                    $('#editProduct').modal('hide');
+
                     location.reload();
 
                 } else {
 
-                    alert(response.message);
+                    showProductResult(
+                        'danger',
+                        'Update Gagal',
+                        response.message
+                    );
+
                 }
+
             },
 
-           error: function(xhr, status, error) {
+            error: function() {
 
-                console.log('STATUS:', xhr.status);
-                console.log('ERROR:', error);
-                console.log('RESPONSE:', xhr.responseText);
+                showProductResult(
+                    'danger',
+                    'Terjadi Kesalahan',
+                    'Terjadi kesalahan saat memperbarui produk.'
+                );
+
             }
+
         });
 
     });
+    
 </script>

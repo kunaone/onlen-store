@@ -160,3 +160,30 @@ $stmt = mysqli_query($conn,
     </div>
   </div>
 </div>
+
+<!-- /=============================================/
+        SHOW MODAL UPDATE PRODUCT RESULT  
+    /=============================================/-->
+<div class="modal fade" tabindex="-1" role="dialog" id="resultProd">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      
+      <div id="resultProdHeader" class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="resultProdTitle">
+          Update
+        </h4>
+      </div>
+      
+      <div class="modal-body">
+        <div id="resultProdAlert" class="alert">
+            <span id="resultProdMessage"></span>
+        </div>     
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    
+    </div>
+  </div>

@@ -112,7 +112,7 @@ if(isset($_POST['update_product'])){
 
         echo json_encode(array(
             'status' => true,
-            'message' => 'Product berhasil diupdate.'
+            'message' => 'Data Produk berhasil di update.'
         ));
 
         exit;
@@ -121,7 +121,7 @@ if(isset($_POST['update_product'])){
 
         echo json_encode(array(
             'status' => false,
-            'message' => 'Gagal mengupdate produk.'
+            'message' => 'Gagal mengupdate Data Produk.'
         ));
 
         exit;

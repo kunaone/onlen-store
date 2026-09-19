@@ -8,6 +8,10 @@ aside,
 #page-wrapper{
 	height: 100%;
 }
+#resultProdHeader {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
 .mysidebar,
 .mynavbar{
 	background-color: rgb(36,39,58);
