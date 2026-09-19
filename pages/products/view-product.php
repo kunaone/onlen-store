@@ -1,6 +1,13 @@
 <?php
-
 include_once "./pages/products/view-add-prod.php";
+include_once "./pages/products/view-detail-prod.php";
+include_once "./pages/products/view-edit-prod.php";
+
+$stmt = mysqli_query($conn,
+        "SELECT p.*, c.name AS category_name
+         FROM products p
+         LEFT JOIN categories c ON p.category_id = c.id
+         ORDER BY p.id DESC");
 ?>
 <div id="page-wrapper">
 	<div class="container-fluid">
@@ -29,70 +36,63 @@ include_once "./pages/products/view-add-prod.php";
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive">
-                            <?php
-                            $dummyImg = "./assets/img/no-img.png";
-
-                            $no=1;
-                            // $products = array(
-                            //                     array(
-                            //                         'name' => 'Mie Goreng Sakura',
-                            //                         'category_name' => 'Makanan',
-                            //                         'sell_price' => 'Rp 3500',
-                            //                         'stok' => '40',
-                            //                         'satuan' => 'dus'
-                            //                     ),
-                            //                     array(
-                            //                         'name' => 'Kopi Kapal Api Special Sachet',
-                            //                         'category_name' => 'Minuman',
-                            //                         'sell_price' => 'Rp 11.500',
-                            //                         'stok' => '10',
-                            //                         'satuan' => 'buah'
-                            //                     ),
-                            //                     array(
-                            //                         'name' => 'Minyak Sanco',
-                            //                         'category_name' => 'Kebutuhan Masak',
-                            //                         'sell_price' => 'Rp 78.500',
-                            //                         'stok' => '10',
-                            //                         'satuan' => 'dus'
-                            //                     )
-                            //                 );
-
-                            $products = array();
-                            
-                            ?>
                             <table class="table <?php if(empty($products)){echo htmlspecialchars('table-bordered');} ?>">
                                 <thead>
                                     <tr class="text-muted" style="font-size: 12px; letter-spacing: .8px;">
                                         <th>#NO</th>
+                                        <th>SKU</th>
                                         <th>GAMBAR</th>
                                         <th>PRODUK</th>
                                         <th>KATEGORI</th>
-                                        <th>HARGA JUAL</th>
                                         <th>STOK</th>
                                         <th>SATUAN</th>
+                                        <th>HARGA JUAL</th>
                                         <th>ACTION</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if(empty($products)){?>
+                                    <?php if(mysqli_num_rows($stmt) == 0){?>
                                     <tr>
                                         <td class="text-center text-muted" style="padding: 24px 0;" colspan="8"><strong>Belum ada produk</strong>, Silahkan isi produk untuk mulai berjualan.</td>
                                     </tr>
                                     <?php 
                                     } else {
-                                        foreach($products as $data){?>
+                                        $no = 1;
+                                        $defaultImg = "./assets/img/no-img.png";
+                                        while($row = mysqli_fetch_assoc($stmt)){
+
+                                          $prod_id = isset($row['id']) ? $row['id'] : '';
+                                          $prod_code = isset($row['prod_code']) ? $row['prod_code'] : '';
+                                          $img_prod = isset($row['img_prod']) ? $row['img_prod'] : '';
+                                          $prod_name = isset($row['name']) ? $row['name'] : '';
+
+                                          $category = isset($row['category_name']) ? $row['category_name'] : '-';
+                                          $unit = isset($row['satuan']) ? $row['satuan'] : '-';
+                                          $selling_price = isset($row['selling_price']) ? $row['selling_price'] : 0;
+                                          $stok = isset($row['qty']) ? $row['qty'] : 0;
+                                          $img_prod = isset($row['img_prod']) ? $row['img_prod'] : '';
+
+                                    ?>
                                     <tr>
                                         <td style="vertical-align: middle;"><?=htmlspecialchars($no++)?></td>
-                                        <td style="vertical-align: middle;"><img src="<?=$dummyImg?>" alt="img-prod" style="width: 80px;"></td>
-                                        <td style="vertical-align: middle;"><?=htmlspecialchars($data['name'])?></td>
-                                        <td style="vertical-align: middle;"><?=htmlspecialchars($data['category_name'])?></td>
-                                        <td style="vertical-align: middle;"><?=htmlspecialchars($data['sell_price'])?></td>
-                                        <td style="vertical-align: middle;"><?=htmlspecialchars($data['stok'])?></td>
-                                        <td style="vertical-align: middle;"><?=htmlspecialchars($data['satuan'])?></td>
+                                        <td style="vertical-align: middle;"><?=htmlspecialchars($prod_code)?></td>
+                                        <!-- img product -->
+                                        <td style="vertical-align: middle;">
+                                            <?php if(!empty($img_prod)){ ?>
+                                            <img src="uploads/products/<?= htmlspecialchars($img_prod); ?>" alt="<?= htmlspecialchars($prod_name); ?>" style="width: 45px; height: 45px; object-fit: cover;">
+                                            <?php }else{ ?>
+                                            <img src="<?=$defaultImg?>" style="width: 45px; height: 45px; object-fit: cover;" alt="default-img">
+                                            <?php } ?>
+                                        </td>
+                                        <td style="vertical-align: middle;"><?=htmlspecialchars($prod_name)?></td>
+                                        <td style="vertical-align: middle;"><?=htmlspecialchars($category)?></td>
+                                        <td style="vertical-align: middle;"><?=htmlspecialchars($stok)?></td>
+                                        <td style="vertical-align: middle;"><?=htmlspecialchars($unit)?></td>
+                                        <td style="vertical-align: middle;">Rp <?=number_format($selling_price, 0, ',', '.');?></td>
                                         <td style="vertical-align: middle; width: 1px; white-space: nowrap;">
-                                            <button class="btn btn-primary"><i class="fa fa-eye"></i></button>
-                                            <button class="btn btn-warning"><i class="fa fa-pencil-square-o"></i></button>
-                                            <button class="btn btn-danger"><i class="fa fa-trash fa-fw"></i></button>
+                                            <button class="btn btn-primary" data-toggle="modal" data-target="#detailProduct" data-id="<?=htmlspecialchars($prod_id)?>"><i class="fa fa-eye"></i></button>
+                                            <button class="btn btn-warning shw-edit-modal" data-id="<?=htmlspecialchars($prod_id)?>"><i class="fa fa-pencil-square-o"></i></button>
+                                            <button class="btn btn-danger" data-toggle="modal" data-target="#delProduct" data-id="<?=htmlspecialchars($prod_id) ?>" data-prodcode="<?= htmlspecialchars($prod_code); ?>"><i class="fa fa-trash fa-fw"></i></button>
                                         </td>
                                     </tr>
                                     <?php }} ?>

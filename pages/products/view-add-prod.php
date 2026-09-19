@@ -1,4 +1,22 @@
 <?php
+/* ==============
+    CUSTOM PROD CODE
+   ==============*/
+$prod_code_query = mysqli_query($conn, "SELECT prod_code FROM products ORDER BY id DESC LIMIT 1");
+$row = mysqli_fetch_assoc($prod_code_query);
+
+if($row){
+
+  $last_code = $row['prod_code'];
+  $num = intval(substr($last_code, 4));
+  $num++;
+
+} else {
+
+  $num = 1;
+}
+
+$product_code = 'PRD-' . str_pad($num, 3, '0', STR_PAD_LEFT);
 
 /* ==============
     CATEGORIES
@@ -12,6 +30,7 @@ while($category = mysqli_fetch_assoc($category_query)){
 }
 
 $category_count = mysqli_num_rows($category_query);
+$has_errors = isset($errors) && !empty($errors);
 
 ?>
 <!-- modal form tambah data -->
@@ -38,15 +57,15 @@ $category_count = mysqli_num_rows($category_query);
             <!-- SKU || Kode Produk -->
             <div class="form-group <?= isset($errors['code_prod']) ? 'has-error' : '';?>" style="padding-left: 0; width: 30%;">
               <label for="code_prod">Kode Produk</label>
-              <input type="text" name="code_prod" class="form-control" id="code_prod" 
-                     value="<?= htmlspecialchars(isset($_POST['code_prod']) ? $_POST['code_prod'] : $product_code); ?>">
+              <div class="input-group">
+                <div class="input-group-addon"><i class="fa fa-barcode"></i></div>
+                <input type="text" name="code_prod" class="form-control" id="code_prod" value="<?= htmlspecialchars(isset($_POST['code_prod']) ? $_POST['code_prod'] : $product_code); ?>">
+              </div>
 
               <?php if (isset($errors['code_prod'])) { ?>
-              
               <span class="help-block">
                 <?= htmlspecialchars($errors['code_prod']); ?>
               </span>
-              
               <?php } ?>
             </div>
 
@@ -88,37 +107,33 @@ $category_count = mysqli_num_rows($category_query);
             </div>
 
             <!-- Stok Produk -->
-            <div class="row">
-              <div class="form-group col-md-6 <?= isset($errors['stok']) ? 'has-error' : ''; ?>">
-                <label for="stok">Stok</label>
-                <input name="stok"type="number" min="0" class="form-control" id="stok"
-                       value="<?= htmlspecialchars(isset($_POST['stok']) ? $_POST['stok'] : ''); ?>">
+            <div class="form-group <?= isset($errors['stok']) ? 'has-error' : ''; ?>">
+              <label for="stok">Stok</label>
+              <input name="stok"type="number" min="0" class="form-control" id="stok"
+                     value="<?= htmlspecialchars(isset($_POST['stok']) ? $_POST['stok'] : ''); ?>">
 
-                <span class="help-block" style="margin: 0;">Boleh diisi 0 jika barang belum tersedia.</span>
+              <span class="help-block" style="margin: 0;">Boleh diisi 0 jika barang belum tersedia.</span>
 
-                <?php if (isset($errors['stok'])) { ?>
-                <span class="help-block">
-                  <strong><?= htmlspecialchars($errors['stok']); ?></strong>
-                </span>
-                <?php } ?>
-              </div>
-
-              <!-- Satuan Produk -->
-              <div class="form-group col-md-2 <?= isset($errors['satuan']) ? 'has-error' : ''; ?>">
-                <label for="satuan">Satuan</label>
-                <input name="satuan" type="text" class="form-control" id="satuan"
-                       value="<?= htmlspecialchars(isset($_POST['satuan']) ? $_POST['satuan'] : ''); ?>">
-
-                <?php if (isset($errors['satuan'])) { ?>
-                <small class="help-block">
-                  <strong><?= htmlspecialchars($errors['satuan']); ?></strong>
-                </small>
-                <?php } ?>
-
-              </div>
-              <div class="col-md-offset-4"></div>
-
+              <?php if (isset($errors['stok'])) { ?>
+              <span class="help-block">
+                <strong><?= htmlspecialchars($errors['stok']); ?></strong>
+              </span>
+              <?php } ?>
             </div>
+
+            <!-- Satuan Produk -->
+            <div class="form-group <?= isset($errors['satuan']) ? 'has-error' : ''; ?>">
+              <label for="satuan">Satuan</label>
+              <input name="satuan" type="text" class="form-control" id="satuan"
+                     value="<?= htmlspecialchars(isset($_POST['satuan']) ? $_POST['satuan'] : ''); ?>">
+
+              <?php if (isset($errors['satuan'])) { ?>
+              <small class="help-block">
+                <strong><?= htmlspecialchars($errors['satuan']); ?></strong>
+              </small>
+              <?php } ?>
+            </div>
+
 
             <!-- Selling Price Product -->
             <div class="form-group <?= isset($errors['selling_price']) ? 'has-error' : ''; ?>">
@@ -144,12 +159,7 @@ $category_count = mysqli_num_rows($category_query);
             <!-- Upload File Gambar Produk -->
             <div class="form-group">
               <label for="img_prod">Gambar Produk</label>
-              <div class="input-group">
-                <div class="input-group-addon">
-                    <i class="fa fa-file-image-o"></i>
-                </div>
-                <input type="file" class="form-control" name="img_prod" id="img_prod" accept="image/jpeg,image/png">
-              </div>
+              <input type="file" name="img_prod" id="img_prod" accept="image/jpeg,image/png">
               <span class="help-block">*Opsional</span>
             </div>
 
